@@ -5,26 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filter and Display</title>
     <style>
-        /* css */
+        /* 样式表 */
         #content-box {
-            border: 1px solid #000;
-            padding: 10px;
-            margin-top: 20px;
+            border: 1px solid #000; /* 外框 */
+            padding: 10px; /* 内边距 */
+            margin-top: 20px; /* 上边距 */
         }
     </style>
 </head>
 <body>
-    <!-- select weather -->
+    <!-- 筛选框 -->
     <label for="select-box">Select a location:</label>
     <select id="select-box">
+        <!-- 这里将使用JavaScript来动态填充选项 -->
     </select>
 
     <!-- JavaScript -->
     <script>
+        // 获取筛选框元素
         var selectBox = document.getElementById("select-box");
+
+        // 发起GET请求获取选项数据
         fetch('http://127.0.0.1:5000/city')
             .then(response => response.json()) // 解析响应数据为JSON格式
             .then(data => {
+                // 循环遍历数据，将每个选项添加到下拉框中
                 data.data.forEach(location => {
                     var optionElement = document.createElement("option");
                     optionElement.value = location;
@@ -36,22 +41,33 @@
                 console.error('Error fetching locations:', error);
             });
     </script>
-    <!-- show weather info -->
+    <!-- 天气信息展示框 -->
     <div id="content-box">
+        <!-- 这里将显示后端返回的内容 -->
         Weather Information Display Box
     </div>
 
+    <!-- JavaScript -->
     <script>
+        // 获取筛选框元素和内容展示框元素
         var selectBox = document.getElementById("select-box");
         var contentBox = document.getElementById("content-box");
 
-
+        // 监听筛选框变化事件
         selectBox.addEventListener("change", function() {
+            // 清空内容展示框的内容
             contentBox.textContent = "";
+
+            // 发起GET请求获取选项数据
             fetch('http://127.0.0.1:5000/weather?city=' + selectBox.value)
                 .then(response => response.json()) // 解析响应数据为JSON格式
                 .then(data => {
-                    contentBox.textContent = JSON.stringify(data);
+                    // 将后端返回的内容显示在内容展示框中
+                    if (data.code !== 200) {
+                        alert('Error fetching data: ' + data.msg);
+                    }else {
+                        contentBox.textContent = JSON.stringify(data.data);
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
